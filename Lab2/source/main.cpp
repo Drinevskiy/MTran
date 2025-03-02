@@ -45,11 +45,11 @@ struct Token {
 // Список ключевых слов Java
 const std::unordered_set<std::string> javaKeywords = {
     "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const",
-    "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float",
-    "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native",
-    "new", "null", "package", "private", "protected", "public", "return", "short", "static",
-    "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try",
-    "void", "volatile", "while", "true", "false", "String", "ArrayList", "HashMap", "HashSet"
+    "continue", "default", "do", "double", "double[]", "else", "enum", "extends", "final", "finally", "float",
+    "float[]", "for", "goto", "if", "implements", "import", "instanceof", "int", "int[]", "interface", "long", 
+    "long[]", "native", "new", "null", "package", "private", "protected", "public", "return", "short", "short[]", 
+    "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try",
+    "void", "volatile", "while", "true", "false", "String", "String[]", "ArrayList", "HashMap", "HashSet"
 };
 
 // Список операторов Java
@@ -118,7 +118,7 @@ private:
 
     Token consumeIdentifierOrKeyword() {
         size_t start = pos;
-        while (pos < source.length() && (std::isalnum(source[pos]) || source[pos] == '_')) {
+        while (pos < source.length() && (std::isalnum(source[pos]) || source[pos] == '_' || source[pos] == '[' || source[pos] == ']')) {
             pos++;
         }
         std::string word = source.substr(start, pos - start);
@@ -243,7 +243,7 @@ int main(int argc, char* argv[]) {
     Lexer lexer(sourceCode);
     std::vector<Token> tokens = lexer.tokenize();
 
-    std::string output_file_name = "D:\\Study\\6_semestr\\MTran\\Lab2\\output.txt";
+    std::string output_file_name = "D:\\Study\\6_semestr\\MTran\\output.txt";
     std::ofstream outputFile(output_file_name);
     if (!outputFile) {
         std::cerr << "Error: Could not open output file\n";
@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
 
     for (const Token& token : tokens) {
         outputFile << "Token: " << token.typeToString()
-                   << " Lexem: \"" << token.value << "\""
+                   << " Lexem: @" << token.value << "@"
                    << " Line: " << token.line
                    << " Id: " << token.id << "\n";
     }

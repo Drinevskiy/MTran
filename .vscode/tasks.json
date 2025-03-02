@@ -17,6 +17,21 @@
             }
         },
         {
+            "type": "shell",
+            "label": "Build task3",
+            "command": "D:/Study/6_semestr/MTran/Lab3/build.bat",
+            "options": {
+                "cwd": "C:\\msys64\\mingw64\\bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Build C++ Project",
             "type": "shell",
             "command": "D:/Study/6_semestr/MTran/Lab2/build.bat",
