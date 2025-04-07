@@ -5,7 +5,9 @@ public class DataStructuresExample {
     // Функция для отображения элементов списка
     public static void displayList(ArrayList<String> list) {
         System.out.println("Элементы списка:");
-        for (String item : list) {
+        int length = list.size();
+        for (int i = 0; i < length; ++i) {
+            String item = list.get(i);
             System.out.println(item);
         }
     }
@@ -28,8 +30,9 @@ public class DataStructuresExample {
 
         // Вывод цен на фрукты
         System.out.println("Цены на фрукты:");
-        for (String fruit : fruitPrices.keySet()) {
-            System.out.println(fruit + ": " + fruitPrices.get(fruit) + " руб.");
-        }
+        
+        // for (String fruit : fruitPrices.keySet()) {
+        //     System.out.println(fruit + ": " + fruitPrices.get(fruit) + " руб.");
+        // }
     }
 }

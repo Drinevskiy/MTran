@@ -2,16 +2,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "DataStructuresExample",
+            "request": "launch",
+            "mainClass": "DataStructuresExample",
+            "projectName": "MTran_18d4ce08"
+        },
+        {
+            "type": "java",
+            "name": "LoopArrayExample",
+            "request": "launch",
+            "mainClass": "LoopArrayExample",
+            "projectName": "MTran_18d4ce08"
+        },
+        {
             "name": "g++.exe build and debug active file",
             "type": "cppdbg",
-            // "type": "cppdbg",
             "request": "launch",
-            // "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
             "program": "D:\\Study\\6_semestr\\MTran\\Lab2\\main.exe",
-            // "args": ["Lab2\\source\\TestLexer.java"],
-            // "args": ["D:\\Study\\6_semestr\\MTran\\Lab 1\\DataStructuresExample.java"],
-            // "args": ["D:\\Study\\6_semestr\\MTran\\Lab 1\\DataTypesExample.java"],
-            "args": ["D:\\Study\\6_semestr\\MTran\\Lab 1\\LoopArrayExample.java"],
+            "args": [
+                "D:\\Study\\6_semestr\\MTran\\Lab 1\\DataStructuresExample.java"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -31,14 +42,11 @@
         {
             "name": "run task3",
             "type": "cppdbg",
-            // "type": "cppdbg",
             "request": "launch",
-            // "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
             "program": "D:\\Study\\6_semestr\\MTran\\Lab3\\main.exe",
-            // "args": ["Lab2\\source\\TestLexer.java"],
-            // "args": ["D:\\Study\\6_semestr\\MTran\\Lab 1\\DataStructuresExample.java"],
-            // "args": ["D:\\Study\\6_semestr\\MTran\\Lab 1\\DataTypesExample.java"],
-            "args": ["D:\\Study\\6_semestr\\MTran\\Lab 1\\LoopArrayExample.java"],
+            "args": [
+                "D:\\Study\\6_semestr\\MTran\\Lab 1\\LoopArrayExample.java"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

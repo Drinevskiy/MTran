@@ -10,14 +10,25 @@ public class DataTypesExample {
         if (isEmployed) {
             System.out.println("Возраст: " + age);
             System.out.println("Зарплата: $" + salary);
-            System.out.println("Оценка: " + grade);
+            System.out.println("Оценка: " + grade + "баллов");
         } else {
             System.out.println("Не трудоустроен");
         }
-
+        
         // Оператор switch case для оценки
         switch (grade) {
             case 'A':
+                switch(age){
+                    case 18:
+                        System.out.println("Взрослый");
+                        break;
+                    case 15:
+                        System.out.println("Молодой");
+                        break;
+                    default:
+                        System.out.println("Возраст не определен");
+                        break;
+                }
                 System.out.println("Отличная работа!");
                 break;
             case 'F':

@@ -58,7 +58,9 @@
         "streambuf": "cpp",
         "text_encoding": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "map": "cpp",
+        "set": "cpp"
     },
     "cmake.sourceDirectory": "D:/Study/6_semestr/MTran/Lab2"
 }
