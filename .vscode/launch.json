@@ -21,6 +21,8 @@
             "request": "launch",
             "program": "D:\\Study\\6_semestr\\MTran\\Lab2\\main.exe",
             "args": [
+                // "D:\\Study\\6_semestr\\MTran\\Lab 1\\LoopArrayExample.java"
+                // "D:\\Study\\6_semestr\\MTran\\Lab 1\\DataTypesExample.java"
                 "D:\\Study\\6_semestr\\MTran\\Lab 1\\DataStructuresExample.java"
             ],
             "stopAtEntry": false,

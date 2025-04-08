@@ -25,8 +25,9 @@ public class LoopArrayExample {
         while (j < length) {
             sum += numbers[j];
             continue;
-            ++j;
         }
+        // float i = 32.4f;
+        // numbers[i] = 34;
         numbers[sum] = 12;
         numbers[j] = 34;
         System.out.println("Сумма чисел в массиве: " + sum);

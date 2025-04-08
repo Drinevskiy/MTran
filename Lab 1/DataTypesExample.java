@@ -1,11 +1,15 @@
 public class DataTypesExample {
+    public static Integer square(int n){
+        // int result = n * n;
+        return n * n;
+    }
     public static void main(String[] args) {
         // Примитивные типы данных
         int age = 25;
         double salary = 55000.50;
         char grade = 'A';
         boolean isEmployed = true;
-
+        int sq_age = square(age);
         // Условный оператор if
         if (isEmployed) {
             System.out.println("Возраст: " + age);

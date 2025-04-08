@@ -305,8 +305,10 @@ class Parser {
                         varNode->addChild(parseArrayInitializer());
                     } else{
                         // Обработать вызов функции
-                        if(tokens[current + 3].lexeme == "(" && (tokens[current + 4].lexeme == ")" || tokens[current + 5].lexeme == ")")){
+                        if(tokens[current + 1].lexeme == "." && tokens[current + 3].lexeme == "(" && (tokens[current + 4].lexeme == ")" || tokens[current + 5].lexeme == ")")){
                             varNode->addChild(parseMethodCall());
+                        } else if(tokens[current + 1].lexeme == "("){
+                            varNode->addChild(parseFunctionCall());
                         } else{
                             varNode->addChild(parseExpression());
                         }
@@ -443,7 +445,7 @@ class Parser {
             match(OPERATOR, ">");
             Token varName = consume();
             ASTNode* hashMapNode = new ASTNode(ASTNode::VARIABLE_DECL, varName.line);
-            hashMapNode->setAttribute("type", "HashMap<" + type1.lexeme + ", " + type2.lexeme + ">");
+            hashMapNode->setAttribute("type", "HashMap<" + type1.lexeme + "," + type2.lexeme + ">");
             hashMapNode->setAttribute("name", varName.lexeme);
             // ASTNode* varNode = new ASTNode("VariableDeclaration", array->value);
             // varNode->addChild(new ASTNode("Type", "HashMap<" + array->children[0]->value + ", " + array->children[1]->value + ">"));
@@ -760,6 +762,7 @@ class Parser {
                 else if (peek().lexeme == "break" || peek().lexeme == "continue") return parseTransitionOperator();
                 else if (peek().lexeme == "ArrayList") return parseVariableArrayList();
                 else if (peek().lexeme == "HashMap") return parseVariableHashMap();
+                else if (peek().lexeme == "return") return parseReturnStatement();
                 else return parseVariableDeclaration();
             }
     
@@ -784,6 +787,15 @@ class Parser {
             return parseExpressionStatement();
         }
         
+        ASTNode* parseReturnStatement(){
+            ASTNode* returnNode = new ASTNode(ASTNode::RETURN_STMT, consume().line);
+            if (!match(OPERATOR, ";")) {
+                returnNode->addChild(parseExpression());
+            }
+            match(OPERATOR, ";");
+            return returnNode;
+        }
+
         ASTNode* parseTransitionOperator() {
             Token keyword = consume();
             ASTNode* node = nullptr;

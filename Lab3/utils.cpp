@@ -38,10 +38,10 @@ bool Type::isArray() const { return kind == ARRAY; }
 bool Type::isClass() const { return kind == CLASS || kind == GENERIC_INSTANCE; }
 bool Type::isBoolean() const { return kind == PRIMITIVE && primitiveKind == BOOLEAN; }
 bool Type::isNumeric() const {
-    return kind == PRIMITIVE && (primitiveKind == INT || primitiveKind == FLOAT || primitiveKind == DOUBLE);
+    return (kind == PRIMITIVE && (primitiveKind == INT || primitiveKind == FLOAT || primitiveKind == DOUBLE)) || className == "Integer";
 }
 bool Type::isInt() const {
-    return kind == PRIMITIVE && primitiveKind == INT;
+    return (kind == PRIMITIVE && primitiveKind == INT) || className == "Integer";
 }
 bool Type::isChar() const {
     return kind == PRIMITIVE && primitiveKind == CHAR;
@@ -83,6 +83,13 @@ bool Type::isAssignableTo(const Type& other) const {
             return true;
         if (primitiveKind == FLOAT && other.primitiveKind == DOUBLE)
             return true;
+    }
+
+    if ((isInt() && other.toString() == "Integer") ||
+        (toString() == "Integer" && other.isInt()) || 
+        (toString() == "Integer" && other.toString() == "Integer")) 
+    {
+        return true;
     }
 
     if (isGenericInstance() && other.isGenericInstance()) {
@@ -388,6 +395,8 @@ void SemanticAnalyzer::initializeBuiltins() {
     currentScope->define(new Symbol("double", Type::doubleType(), Symbol::CLASS));
     currentScope->define(new Symbol("void", Type::voidType(), Symbol::CLASS));
     currentScope->define(new Symbol("String", Type::stringType(), Symbol::CLASS));
+    // currentScope->define(new Symbol("Integer", Type::classType("Integer"), Symbol::CLASS));
+    currentScope->define(new Symbol("Integer", Type::intType(), Symbol::CLASS));
 
     auto printlnMethod = new FunctionSymbol("println", Type::voidType());
     printlnMethod->addParameter("value", Type::stringType());
@@ -417,18 +426,26 @@ void SemanticAnalyzer::initializeBuiltins() {
     addMethod->addParameter("e", Type::genericParamType("T"));
     arrayListClass->getSymbolTable()->define(addMethod);
 
-    // ClassSymbol* hashMapClass = new ClassSymbol("HashMap");
-    // hashMapClass->getSymbolTable()->define(
-    //     new FunctionSymbol("size", Type::intType())
-    // );
 
-    // auto getMethod = new FunctionSymbol("get", Type::classType("T"));
-    // getMethod->addParameter("index", Type::intType());
-    // arrayListClass->getSymbolTable()->define(getMethod);
+    ClassSymbol* hashMapClass = new ClassSymbol("HashMap");
+    hashMapClass->setGeneric(true);
+    hashMapClass->addGenericParam("K");  
+    hashMapClass->addGenericParam("V");  
+
+    auto putMethod = new FunctionSymbol("put", Type::intType());
+    putMethod->addParameter("key", Type::genericParamType("K"));    
+    putMethod->addParameter("value", Type::genericParamType("V"));  
+    hashMapClass->getSymbolTable()->define(putMethod);
+
+
+    ClassSymbol* integerClass = new ClassSymbol("Integer");
+    integerClass->getSymbolTable()->define(
+        new FunctionSymbol("intValue", Type::intType())
+    );
 
     globalScope->define(arrayListClass);
-    // globalScope->define(arrayListClass);
-    // currentScope->define(hashMapClass);
+    globalScope->define(hashMapClass);
+    globalScope->define(integerClass);
     currentScope->define(systemClass);
     currentScope->define(printStreamClass);
 }
@@ -456,6 +473,18 @@ std::vector<std::string> split(const std::string& s, char delimiter) {
 }
 
 Type SemanticAnalyzer::resolveType(const std::string& typeName, int line) {
+    static const std::map<std::string, std::string> primitiveToWrapper = {
+        {"int", "Integer"},
+        {"boolean", "Boolean"}
+    };
+
+    if (primitiveToWrapper.count(typeName)) {
+        std::string wrapperName = primitiveToWrapper.at(typeName);
+        Symbol* wrapperSymbol = globalScope->resolve(wrapperName);
+        if (wrapperSymbol) {
+            return Type::classType(wrapperName);
+        }
+    }
     size_t arrayBracketPos = typeName.find("[]");
     if (arrayBracketPos != std::string::npos) {
         std::string baseTypeName = typeName.substr(0, arrayBracketPos);
@@ -498,6 +527,7 @@ Type SemanticAnalyzer::resolveType(const std::string& typeName, int line) {
     if (typeName == "double") return Type::doubleType();
     if (typeName == "void") return Type::voidType();
     if (typeName == "String") return Type::stringType();
+    if (typeName == "Integer") return Type::intType();
     
     // Symbol* symbol = currentScope->resolve(typeName);
     Symbol* symbol = globalScope->resolve(typeName);
@@ -664,8 +694,8 @@ void SemanticAnalyzer::visitMethodDeclaration(ASTNode* Node) {
     FunctionSymbol* outerMethod = currentMethod;
     currentMethod = methodSymbol;
     
-    enterScope();
     currentScope->define(methodSymbol);
+    enterScope();
     
     if (paramsNode) {
         for (size_t i = 0; i < paramsNode->getChildCount(); i++) {
@@ -1055,7 +1085,7 @@ Type SemanticAnalyzer::checkAssignmentTarget(ASTNode* Node) {
                              arrayASTNode->getLine());
         }
         
-        if (!indexType.isNumeric()) {
+        if (!indexType.isInt()) {
             throw SemanticError("Array index must be numeric, found: " + indexType.toString(), 
                              indexASTNode->getLine());
         }
@@ -1172,6 +1202,16 @@ Type SemanticAnalyzer::checkBinaryExpression(ASTNode* Node) {
             return Type::booleanType();
         }
         
+        // auto isNumericOrWrapper = [](const Type& t) {
+        //     return t.isNumeric() || 
+        //            t.toString() == "Integer" || 
+        //            t.toString() == "Float" || 
+        //            t.toString() == "Double";
+        // };
+        
+        // if (isNumericOrWrapper(leftType) && isNumericOrWrapper(rightType)) {
+        //     return Type::booleanType();
+        // }
         if (leftType.isNumeric() && rightType.isNumeric()) {
             return Type::booleanType();
         }
@@ -1245,6 +1285,7 @@ Type SemanticAnalyzer::getNumericResultType(Type t1, Type t2) {
         {"double", 4}, 
         {"float", 3}, 
         {"int", 2}, 
+        {"Integer", 2},
         {"char", 1}
     };
 
