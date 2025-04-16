@@ -375,7 +375,8 @@ void SemanticAnalyzer::analyze(ASTNode* ast) {
         std::cout << "Semantic analysis completed successfully." << std::endl;
     } catch (const SemanticError& error) {
         errors.push_back(error);
-        std::cerr << error.what() << std::endl;
+        // std::cerr << error.what() << std::endl;
+        throw error;
     }
 }
 
@@ -1037,7 +1038,8 @@ void SemanticAnalyzer::visitReturnStatement(ASTNode* Node) {
 
 void SemanticAnalyzer::visitExpressionStatement(ASTNode* Node) {
     if (Node->getChildCount() > 0) {
-        checkExpression(Node->getChild(0));
+        visitNode(Node->getChild(0));
+        // checkExpression(Node->getChild(0));
     }
 }
 
@@ -1586,18 +1588,46 @@ Type SemanticAnalyzer::checkNewExpression(ASTNode* Node) {
     return classType;
 }
 
-bool SemanticAnalyzer::hasReturnStatement(ASTNode* Node) {
-    if (!Node) return false;
-    
-    for (size_t i = 0; i < Node->getChildCount(); i++) {
-        ASTNode* child = Node->getChild(i);
+bool SemanticAnalyzer::hasReturnStatement(ASTNode* node) {
+    if (!node) return false;
+
+    // Рекурсивно проверяем все дочерние узлы
+    for (size_t i = 0; i < node->getChildCount(); ++i) {
+        ASTNode* child = node->getChild(i);
+        
+        // Если нашли прямой return - сразу true
         if (child->getType() == ASTNode::RETURN_STMT) return true;
-        if (child->getType() == ASTNode::BLOCK && hasReturnStatement(child)) return true;
-        if (child->getType() == ASTNode::IF_STMT) {
-            bool thenHasReturn = hasReturnStatement(child->getChild(1));
-            bool elseHasReturn = child->getChildCount() > 2 && 
-                                hasReturnStatement(child->getChild(2));
-            if (thenHasReturn && elseHasReturn) return true;
+        
+        // Особые случаи для управляющих конструкций
+        switch (child->getType()) {
+            case ASTNode::BLOCK:
+                if (hasReturnStatement(child)) return true;
+                break;
+                
+            case ASTNode::IF_STMT: {
+                bool thenHasReturn = hasReturnStatement(child->getChild(1));
+                bool elseHasReturn = child->getChildCount() > 2 
+                    ? hasReturnStatement(child->getChild(2))
+                    : false;
+                
+                // Если есть else - требуем return в обеих ветках
+                if (child->getChildCount() > 2 && !(thenHasReturn && elseHasReturn))
+                    return false;
+                
+                if (thenHasReturn || elseHasReturn) return true;
+                break;
+            }
+            
+            case ASTNode::SWITCH_STMT:
+                // Проверяем все case и default
+                for (size_t j = 1; j < child->getChildCount(); ++j) {
+                    if (!hasReturnStatement(child->getChild(j)))
+                        return false;
+                }
+                return true;
+            
+            default:
+                if (hasReturnStatement(child)) return true;
         }
     }
     

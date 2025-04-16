@@ -3,7 +3,10 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <thread>
+#include <chrono>
 #include "utils.hpp"
+#include "generator.hpp"
 
 enum TokenType {
     KEYWORD,
@@ -752,6 +755,7 @@ class Parser {
 
 
         ASTNode* parseStatement() {
+            ASTNode* exprStatement = new ASTNode(ASTNode::EXPRESSION_STMT, tokens[current].line);
             if (peek().type == KEYWORD) {
                 if (peek().lexeme == "if") return parseIfStatement();
                 else if (peek().lexeme == "while") return parseWhileLoop();
@@ -760,30 +764,50 @@ class Parser {
                 else if (peek().lexeme == "switch") return parseSwitchCaseStatement();
                 // else if (peek().lexeme.find("[]") != std::string::npos ) return parseArrayDeclaration();
                 else if (peek().lexeme == "break" || peek().lexeme == "continue") return parseTransitionOperator();
-                else if (peek().lexeme == "ArrayList") return parseVariableArrayList();
-                else if (peek().lexeme == "HashMap") return parseVariableHashMap();
-                else if (peek().lexeme == "return") return parseReturnStatement();
-                else return parseVariableDeclaration();
+                else if (peek().lexeme == "ArrayList") {
+                    exprStatement->addChild(parseVariableArrayList());
+                    return exprStatement;
+                }
+                else if (peek().lexeme == "HashMap") {
+                    exprStatement->addChild(parseVariableHashMap());
+                    return exprStatement;
+                } else if (peek().lexeme == "return") {
+                    exprStatement->addChild(parseReturnStatement());
+                    return exprStatement;
+                }
+                else {
+                    exprStatement->addChild(parseVariableDeclaration());
+                    return exprStatement;
+                }
             }
     
             if (peek().type == IDENTIFIER) {
                 if(peek().lexeme == "System"){
-                    return parseSystemPrint();
+                    exprStatement->addChild(parseSystemPrint());
+                    return exprStatement;
                 }
                 if (tokens[current + 1].lexeme == "=" || tokens[current + 1].lexeme == ";") {
-                    return parseVariableAssigment();
+                    exprStatement->addChild(parseVariableAssigment());
+                    return exprStatement;
                 }
                 if (tokens[current + 1].lexeme == "+=" || tokens[current + 1].lexeme == "-=") {
-                    return parseExpressionStatement();
+                    exprStatement->addChild(parseExpressionStatement());
+                    return exprStatement;
                 }
                 if(tokens[current + 1].lexeme == "."){
-                    return parseMethodCall();
+                    exprStatement->addChild(parseMethodCall());
+                    return exprStatement;
                 }
                 // else{
-                    return parseFunctionCall();
+                    exprStatement->addChild(parseFunctionCall());
+                    return exprStatement;
                 // }
             }
-    
+            if(peek().lexeme == "++" || peek().lexeme == "--"){
+                exprStatement->addChild(parseTerm());
+                match(OPERATOR, ";");
+                return exprStatement;
+            }
             return parseExpressionStatement();
         }
         
@@ -1025,10 +1049,46 @@ int main() {
         std::cout << "Ошибка: " << e.what() << " в строке " << e.getLine() << std::endl;
     } 
     SemanticAnalyzer sm_analyzer = SemanticAnalyzer();
-    sm_analyzer.analyze(ast);
-    // for(auto error: sm_analyzer.getErrors()){
-    //     std::cout << error.getErrorMessage() << std::endl;
-    // }
+    try{
+        sm_analyzer.analyze(ast);
+        CodeGenerator generator;
+        std::string cppCode = generator.generate(ast);
+        
+        // Запись сгенерированного кода в файл
+        std::string outputFile = "output.cpp";
+        std::ofstream outFile(outputFile);
+        if (outFile.is_open()) {
+            outFile << cppCode;
+            outFile.close();
+
+            if (!std::ifstream(outputFile)) {
+                std::cerr << "Файл не создан!" << std::endl;
+                return 1;
+            }
+
+            std::cout << "Код успешно сгенерирован в: " << outputFile << std::endl;
+            // Компиляция и запуск
+            std::string compile_cmd = "g++ " + outputFile + " -o my_program.exe";
+            const std::string run_cmd = "my_program.exe";
+            std::cout << "Компиляция...\n";
+
+            if (system(compile_cmd.c_str()) == 0) {
+                std::cout << "Запуск программы...\n\n";
+                system(run_cmd.c_str());
+            } else {
+                std::cerr << "Ошибка компиляции!" << std::endl;
+            }
+        } else {
+            std::cerr << "Ошибка: Не удалось открыть выходной файл." << std::endl;
+            return 1;
+        }
+    } catch(const SemanticError& error){
+        std::cerr << error.what() << std::endl;
+    } catch (const std::runtime_error& error){
+        std::cerr << error.what() << std::endl;
+    }
+
+    
     delete ast;
     return 0;
 }

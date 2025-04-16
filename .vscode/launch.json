@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "java",
             "name": "DataStructuresExample",
@@ -64,6 +65,27 @@
             ],
             "preLaunchTask": "Build task3",
             "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Run compiler",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "D:\\Study\\6_semestr\\MTran\\Lab3\\main.exe",
+            // "program": "${workspaceFolder}/Lab3/main.exe",
+            "preLaunchTask": "Full Pipeline",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

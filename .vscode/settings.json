@@ -60,7 +60,10 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "map": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "ratio": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp"
     },
     "cmake.sourceDirectory": "D:/Study/6_semestr/MTran/Lab2"
 }

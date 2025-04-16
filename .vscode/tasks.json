@@ -2,6 +2,58 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build Program1",
+            "type": "shell",
+            "command": "D:/Study/6_semestr/MTran/Lab2/build.bat",
+            "args": [],
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Run Program1",
+            "type": "shell",
+            "command": "D:\\Study\\6_semestr\\MTran\\Lab2\\main.exe",
+            "args": [
+                // "D:\\Study\\6_semestr\\MTran\\Lab 1\\LoopArrayExample.java"
+                "D:\\Study\\6_semestr\\MTran\\Lab 1\\DataTypesExample.java"
+                // "D:\\Study\\6_semestr\\MTran\\Lab 1\\DataStructuresExample.java"
+            ],
+            "dependsOn": ["g++.exe build active file"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Program2",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${workspaceFolder}/Lab3/main.exe"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Run Program2",
+            "type": "shell",
+            "command": "D:\\Study\\6_semestr\\MTran\\Lab3\\main.exe",
+            "dependsOn": ["Build task3"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Full Pipeline",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "g++.exe build active file",
+                "Run Program1",
+                "Build task3",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "type": "shell",
             "label": "g++.exe build active file",
             "command": "D:/Study/6_semestr/MTran/Lab2/build.bat",

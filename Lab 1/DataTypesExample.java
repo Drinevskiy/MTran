@@ -10,6 +10,7 @@ public class DataTypesExample {
         char grade = 'A';
         boolean isEmployed = true;
         int sq_age = square(age);
+        
         // Условный оператор if
         if (isEmployed) {
             System.out.println("Возраст: " + age);
@@ -18,11 +19,12 @@ public class DataTypesExample {
         } else {
             System.out.println("Не трудоустроен");
         }
-        
+
         // Оператор switch case для оценки
         switch (grade) {
             case 'A':
                 switch(age){
+
                     case 18:
                         System.out.println("Взрослый");
                         break;
@@ -42,5 +44,7 @@ public class DataTypesExample {
                 System.out.println("Недоступная оценка.");
                 break;
         }
+        
     }
+    
 }

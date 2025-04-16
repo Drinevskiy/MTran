@@ -26,10 +26,11 @@ public class LoopArrayExample {
             sum += numbers[j];
             continue;
         }
-        // float i = 32.4f;
-        // numbers[i] = 34;
         numbers[sum] = 12;
         numbers[j] = 34;
         System.out.println("Сумма чисел в массиве: " + sum);
+        // float i = 32.4f;
+        float fl_value = 54.3f;
+        // index[j] = 12;
     }
 }
